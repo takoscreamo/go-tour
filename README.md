@@ -24,8 +24,8 @@ Hello, 世界
 - ビルドは `go build ＜ファイル名＞`
 - 実行は `go run ＜ファイル名＞`
 
----
 
+---
 
 ## Packages
 
@@ -54,7 +54,6 @@ My favorite number is 6
 - エントリポイントは package main 内の func main()
 
 
-
 ---
 
 ## Imports
@@ -80,6 +79,8 @@ Now you have 2.6457513110645907 problems.
 メモ：
 - `import` で複数パッケージをまとめてインポート
 - 1行ずつ書くこともできるが、Go のコードスタイルではまとめて書くことが推奨されている
+
+
 
 ---
 
@@ -112,6 +113,7 @@ func main() {
   - 同じパッケージ内でのみ参照可能
   - 例: `math.pi`, `math.hoge`
 
+
 ---
 
 ## Functions
@@ -128,7 +130,6 @@ func add(x int, y int) int {
 func main() {
 	fmt.Println(add(42, 13))
 }
-
 ```
 
 実行結果：
@@ -137,5 +138,41 @@ func main() {
 ```
 
 メモ：
+- Goでは引数で、変数名の 後ろ に型名を書く
+  - 例：`add(x int)`
+
+
+---
+
+## Functions continued
+```go
+package main
+
+import "fmt"
+
+func add(x, y int) int {
+	return x + y
+}
+
+func main() {
+	fmt.Println(add(42, 13))
+}
+```
+
+実行結果；
+```
+55
+```
+
+メモ：
+- 引数の型を省略してまとめて書くことができる `(x, y int)`
+- 実務でも2~3個の引数が同じ型ならまとめて可読性上げることもある
+- 4つ以上の場合は構造体を定義して、構造体を引数にした方が無難
+
+
+---
+
+## Multiple results
+
 
 
