@@ -245,9 +245,77 @@ func main() {
 
 ### [未]Variables
 ### [未]Variables with initializers
+
+---
 ### [未]Short variable declarations
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var i, j int = 1, 2
+	k := 3
+	c, python, java := true, false, "no!"
+
+	fmt.Println(i, j, k, c, python, java)
+}
+```
+
+実行結果：
+```
+1 2 3 true false no!
+```
+
+メモ：
+- Goでは`var i int = 10`という書き方で変数宣言もできる
+- `i := 10`という代入文を使って暗黙的な型宣言もできる
+- 関数内では`:=`を積極的に使うべき
+- 関数外と、明示的に型指定したい場合に`var`を使う(int64、float64、構造体ゼロ値など)
+
+
+---
+
 ### [未]Basic types
+
+---
+
 ### [未]Zero values
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var i int
+	var f float64
+	var b bool
+	var s string
+	fmt.Printf("%v %v %v %q\n", i, f, b, s)
+}
+```
+
+実行結果：
+```
+0 0 false ""
+```
+
+メモ：
+- 初期値を与えずに変数宣言すると以下のゼロ値が入る
+  - 数値型(int,floatなど): `0`
+  - bool型: `false`
+  - string型: `""`
+  - pointer, slice, map, chan, func: `nil`
+  - struct: `各フィールドがその型のゼロ値になる`
+- ゼロ値を使うべきシーン
+  - struct、slice など初期化しなくても普通に動く型
+  - カウンタ・一時変数など
+- ゼロ値を使うべきではないシーン
+  - map のように ゼロ値(nil)だと使えずエラーにつながるもの
+
+
+---
+
 ### [未]Type conversions
 ### [未]Type inference
 ### [未]Constants
@@ -273,6 +341,44 @@ func main() {
 ---
 
 ### [未]Pointers
+```go
+package main
+
+import "fmt"
+
+func main() {
+	i, j := 42, 2701
+
+	p := &i         // pに、iのアドレスを代入 (var p *int = &i と同じ意味)
+	fmt.Println(*p) // *p(iのアドレスの実体)を出力しているので、出力は 42
+	*p = 21         // *p(iのアドレスの実体)に21を代入 (=iに上書き)
+	fmt.Println(i)  // 上書きされたiを出力しているので、出力は 21
+
+	p = &j         // pに、jのアドレスを代入(上書き)
+	*p = *p / j    // *p(jのアドレスの実体)に、*p/j の計算結果を代入 (=jに上書き)
+	fmt.Println(j) // 上書きされたjを出力しているので、出力は 1
+}
+```
+
+実行結果：
+```
+42
+21
+1
+```
+
+メモ：
+| 記法 | 意味 |
+| --- | --- |
+| `&i` | 変数i のアドレスを取得する |
+| `p := &i` | pに変数iのアドレスを代入
+| `*p` | pが指しているアドレスの値を取り出す（デリファレンス）
+| `*p = 21` | ポインタ経由でアドレスの値を書き換える
+|`var p *int` | intを指すポインタ型 を宣言
+
+
+---
+
 ### [未]Structs
 ### [未]Struct Fields
 ### [未]Pointers to structs
