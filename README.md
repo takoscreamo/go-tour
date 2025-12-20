@@ -247,7 +247,7 @@ func main() {
 ### [未]Variables with initializers
 
 ---
-### [未]Short variable declarations
+### Short variable declarations
 ```go
 package main
 
@@ -280,7 +280,7 @@ func main() {
 
 ---
 
-### [未]Zero values
+### Zero values
 ```go
 package main
 
@@ -340,7 +340,7 @@ func main() {
 
 ---
 
-### [未]Pointers
+### Pointers
 ```go
 package main
 
@@ -379,9 +379,76 @@ func main() {
 
 ---
 
-### [未]Structs
+### Structs
+
+```go
+package main
+
+import "fmt"
+
+type Vertex struct {
+	X int
+	Y int
+}
+
+func main() {
+	fmt.Println(Vertex{1, 2})
+}
+```
+
+実行結果：
+```
+{1 2}
+```
+
+メモ：
+- struct (構造体)は、フィールドの集まり
+- `type 名前 =? 型定義` の構文で型に名前をつける。構造体以外でも使う。
+  - 構造体：`type A struct {}`
+  - インターフェース：`type B interface {}`
+  - 独自型：`type UserID int`
+  - 関数：`type Fn func()`
+  - スライス/マップ：`type IDs []int`
+
+
+---
+
 ### [未]Struct Fields
+
+---
+
 ### [未]Pointers to structs
+
+```go
+package main
+
+import "fmt"
+
+type Vertex struct {
+	X int
+	Y int
+}
+
+func main() {
+	v := Vertex{1, 2}
+	p := &v
+	p.X = 1e9
+	fmt.Println(v)
+}
+```
+
+実行結果：
+```
+{1000000000 2}
+```
+
+メモ：
+- structのフィールドは、structのポインタを通してアクセスすることもできる
+- `p.X`でアクセスできる
+   - ちなみに`(*p).X`と書くことでアクセスもできるが長いのであまり使われない
+
+---
+
 ### [未]Struct Literals
 ### [未]Arrays
 ### [未]Slices
