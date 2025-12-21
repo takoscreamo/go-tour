@@ -417,7 +417,7 @@ func main() {
 
 ---
 
-### [未]Pointers to structs
+### Pointers to structs
 
 ```go
 package main
@@ -451,11 +451,134 @@ func main() {
 
 ### [未]Struct Literals
 ### [未]Arrays
-### [未]Slices
-### [未]Slices are like references to arrays
+
+---
+
+### Slices
+```go
+package main
+
+import "fmt"
+
+func main() {
+	primes := [6]int{2, 3, 5, 7, 11, 13} // 長さ6の固定長配列 primes を宣言して値をセット
+
+	var s []int = primes[1:4]  // 長さ可変のスライス s を宣言して、primesのインデックス1から4未満を参照するようにセット
+	fmt.Println(s)
+}
+```
+
+実行結果：
+```
+[3 5 7]
+```
+
+メモ：
+- Goでは、配列`[n]int`は固定長。スライス`[]int`は可変長。
+
+
+
+---
+
+### Slices are like references to arrays
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	names := [4]string{
+		"John",
+		"Paul",
+		"George",
+		"Ringo",
+	}
+	fmt.Println(names) // [John Paul George Ringo]
+
+	a := names[0:2]
+	b := names[1:3]
+	fmt.Println(a, b) // [John Paul] [Paul George]
+
+	b[0] = "XXX" // b[0] は names[1] を指しており、元のnames配列を書き換えている
+	fmt.Println(a, b) // [John XXX] [XXX George]
+	fmt.Println(names) // [John XXX George Ringo]
+}
+```
+
+実行結果：
+```
+[John Paul George Ringo]
+[John Paul] [Paul George]
+[John XXX] [XXX George]
+[John XXX George Ringo]
+```
+
+メモ：
+- スライスは配列そのものを持たず、配列の一部を“参照”している
+- スライス同士が同じ配列を共有することがある
+- どれか1つのスライスを変更すると、配列・他のスライスにも影響する
+- コピーしたい場合は`copy()`か`append()`を使う
+
+
+---
+
 ### [未]Slice literals
 ### [未]Slice defaults
-### [未]Slice length and capacity
+
+---
+
+### Slice length and capacity
+```go
+package main
+
+import "fmt"
+
+func main() {
+	s := []int{2, 3, 5, 7, 11, 13} // length=6、capacity=6の配列のスライス
+	printSlice(s)                  // len=6 cap=6 [2 3 5 7 11 13]
+
+	s = s[:0]     // lenを0にする。capは6のまま。
+	printSlice(s) // len=0 cap=6 []
+
+	s = s[:4]     // lenを4伸ばす。capは6のまま。
+	printSlice(s) // len=4 cap=6 [2 3 5 7]
+
+	s = s[2:]     // sliceの先頭ポインタをindex=2にずらす。capが2減って4になる。
+	printSlice(s) // len=2 cap=4 [5 7]
+}
+
+func printSlice(s []int) {
+	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
+}
+```
+
+実行結果：
+```
+len=6 cap=6 [2 3 5 7 11 13]
+len=0 cap=6 []
+len=4 cap=6 [2 3 5 7]
+len=2 cap=4 [5 7]
+```
+
+メモ：
+- スライスは長さ(length)と容量(capacity)の両方を持っている
+- 長さ(length)とは
+  - `len(s)`で取得できる
+  - スライスに「今含まれている要素の数」
+  - `for range` で回る範囲
+  - `s[i]` でアクセスできる最大範囲
+- 容量(capacity)とは
+  - `cap(s)`で取得できる
+  - スライスの「先頭要素」から、元配列の末尾までの要素数
+  - 元配列基準
+  - 「この slice をどこまで伸ばせるか」を表す
+- 容量を超えて伸ばすと何が起こるか
+  - `s = s[:5]` → panic（実行時エラー）
+
+
+---
+
 ### [未]Nil slices
 ### [未]Creating a slice with make
 ### [未]Slices of slices
