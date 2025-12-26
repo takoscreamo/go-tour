@@ -579,8 +579,91 @@ len=2 cap=4 [5 7]
 
 ---
 
-### [未]Nil slices
-### [未]Creating a slice with make
+### Nil slices
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var s []int
+	fmt.Println(s, len(s), cap(s))
+	if s == nil {
+		fmt.Println("nil!")
+	}
+}
+```
+
+実行結果：
+```
+[] 0 0
+nil!
+```
+
+
+メモ：
+- スライスのゼロ値は `nil`
+- ただし`Println`の表示では空配列と同じく`[]`で表示される
+    ```
+		var s1 []int            // nil slice
+		s2 := []int{}           // 空スライス
+		fmt.Println(s1)         // []
+		fmt.Println(s2)         // []
+		fmt.Println(s1 == nil)  // true
+		fmt.Println(s2 == nil)  // false
+	```
+
+---
+
+### Creating a slice with make
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	a := make([]int, 5) // 長さ5のスライスを作る。すべてゼロ値で初期化。
+	printSlice("a", a)  // a len=5 cap=5 [0 0 0 0 0]
+
+	b := make([]int, 0, 5) // 長さ0、容量5のスライスを作る
+	printSlice("b", b)     // b len=0 cap=5 []
+
+	c := b[:2]         // 「先頭から2要素分」を 見えるようにした
+	printSlice("c", c) // c len=2 cap=5 [0 0]
+
+	d := c[2:5]        // 開始位置を2にずらして元配列の index 2〜4 を指すスライスを作った
+	printSlice("d", d) // d len=3 cap=3 [0 0 0]
+}
+
+func printSlice(s string, x []int) {
+	fmt.Printf("%s len=%d cap=%d %v\n",
+		s, len(x), cap(x), x)
+}
+```
+
+実行結果：
+```
+a len=5 cap=5 [0 0 0 0 0]
+b len=0 cap=5 []
+c len=2 cap=5 [0 0]
+d len=3 cap=3 [0 0 0]
+```
+
+メモ：
+- make([]T, len, cap) は 配列を確保し、その配列を参照するスライスを作る
+- len は「今使っている長さ」、cap は「将来使える余白」
+- cap を指定することで append 時の再確保を防げる
+- 高頻度処理・件数が見積もれる場合は make を使う意味がある
+- make([]T, 0, n) は「これから詰める」意図を明示できる
+- `[:n]` →「先頭から n 個見る」
+- `[i:j]` →「i から j-1 まで見る」
+- パッと見て分かりづらいのでまとめ直したい
+
+
+---
+
 ### [未]Slices of slices
 ### [未]Appending to a slice
 ### [未]Range
