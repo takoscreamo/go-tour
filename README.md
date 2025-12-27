@@ -665,8 +665,91 @@ d len=3 cap=3 [0 0 0]
 ---
 
 ### [未]Slices of slices
-### [未]Appending to a slice
-### [未]Range
+
+---
+
+### Appending to a slice
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var s []int
+	printSlice(s)
+
+	s = append(s, 0)
+	printSlice(s)
+
+	s = append(s, 1)
+	printSlice(s)
+
+	s = append(s, 2, 3, 4)
+	printSlice(s)
+}
+
+func printSlice(s []int) {
+	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
+}
+```
+
+実行結果：
+```
+len=0 cap=0 []
+len=1 cap=1 [0]
+len=2 cap=2 [0 1]
+len=5 cap=6 [0 1 2 3 4]
+```
+
+メモ：
+- `append`はスライスに要素を追加する関数
+  - 厳密には「新しいスライスを返す関数」
+  - `cap`が足りなければ配列を作り直す
+- PHPと違いGoにはこの方法しか要素追加する方法はない
+  - PHPの場合は`$arr[] = $value`や`array_push()`など複数あるけど
+- 戻り値が必要
+  - `s = append(s, 1)` このように書く必要がある
+  - `append(s, 1)` これだと追加されない
+
+---
+
+### Range
+
+```go
+package main
+
+import "fmt"
+
+var pow = []int{1, 2, 4, 8, 16, 32, 64, 128}
+
+func main() {
+	for i, v := range pow {
+		fmt.Printf("2**%d = %d\n", i, v)
+	}
+}
+```
+
+実行結果：
+```
+2**0 = 1
+2**1 = 2
+2**2 = 4
+2**3 = 8
+2**4 = 16
+2**5 = 32
+2**6 = 64
+2**7 = 128
+```
+
+メモ：
+- Goの`for + range`は、PHP等の`foreach`とほぼ同じ
+- `for + range`は値コピーなので元の値(pow)が書き換えられない
+  - PHPもデフォルトは値コピー。オプションで参照にもできるが基本使わないのでほぼ同じと考えてOK
+
+
+---
+
 ### [未]Range continued
 ### [未]Exercise: Slices
 ### [未]Maps
