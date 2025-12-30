@@ -752,10 +752,91 @@ func main() {
 
 ### [未]Range continued
 ### [未]Exercise: Slices
-### [未]Maps
+
+---
+
+### Maps
+
+```go
+package main
+
+import "fmt"
+
+type Vertex struct {
+	Lat, Long float64
+}
+
+var m map[string]Vertex
+
+func main() {
+	m = make(map[string]Vertex)
+	m["Bell Labs"] = Vertex{
+		40.68433, -74.39967,
+	}
+	fmt.Println(m["Bell Labs"])
+}
+```
+
+実行結果：
+```
+{40.68433 -74.39967}
+```
+
+メモ：
+- Goの連想配列は`map`
+- mapのゼロ値は `nil`
+- PHPと異なり、`make`しないと要素追加できない(宣言だけでは使えない)
+- Goのmapは型安全なのでキーごとに異なる型の値は入れられない(PHPは入れられる)
+
+
+---
+
 ### [未]Map literals
 ### [未]Map literals continued
-### [未]Mutating Maps
+
+---
+
+### Mutating Maps
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	m := make(map[string]int)
+
+	m["Answer"] = 42 // 要素の追加
+	fmt.Println("The value:", m["Answer"]) // 要素の取得
+
+	m["Answer"] = 48 // 要素の更新
+	fmt.Println("The value:", m["Answer"]) // 要素の取得
+
+	delete(m, "Answer") // 要素の削除
+	fmt.Println("The value:", m["Answer"])
+
+	v, ok := m["Answer"] // 存在チェック
+	fmt.Println("The value:", v, "Present?", ok)
+}
+```
+
+実行結果：
+```
+The value: 48
+The value: 42
+The value: 0
+The value: 0 Present? false
+```
+
+メモ：
+- mapは 存在しないキーでもゼロ値が返る
+- 存在確認が必要な場合は必ず ok を使う
+  - valueはゼロ値が入るため存在確認に使えない
+- 追加・更新・削除は安全で、存在しないキーに対する操作でもpanicしない
+
+
+---
+
 ### [未]Exercise: Maps
 ### [未]Function values
 ### [未]Function closures
