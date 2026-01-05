@@ -838,8 +838,142 @@ The value: 0 Present? false
 ---
 
 ### [未]Exercise: Maps
-### [未]Function values
-### [未]Function closures
+
+---
+
+### Function values
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+// compute は「2つの float64 を受け取って float64 を返す関数」を受け取り、
+// その関数に (3, 4) を渡して結果を返す
+func compute(fn func(float64, float64) float64) float64 {
+	// fn(3, 4)
+	return fn(3, 4)
+}
+
+func main() {
+	// hypot は直角三角形の斜辺の長さを求める関数
+	// 数学的には：√(x² + y²)
+	hypot := func(x, y float64) float64 {
+		// x*x + y*y  = x² + y²
+		// math.Sqrt = √
+		return math.Sqrt(x*x + y*y)
+	}
+
+	// √(5² + 12²) = √(25 + 144) = √169 = 13
+	fmt.Println(hypot(5, 12))
+
+	// compute(hypot)
+	// = hypot(3, 4)
+	// = √(3² + 4²) = √25 = 5
+	fmt.Println(compute(hypot))
+
+	// compute(math.Pow)
+	// = math.Pow(3, 4)
+	// = 3⁴ = 81
+	fmt.Println(compute(math.Pow))
+}
+```
+
+実行結果：
+```
+13
+5
+81
+```
+
+メモ：
+- Go では 関数も値（変数）として扱える
+- 関数は
+  - 変数に代入できる
+	- 引数として渡せる
+	- 戻り値として返せる
+- 関数値を使うと 処理の中身を差し替えられる設計ができる
+- interface を作らなくても関数だけ渡せる
+- DDD / クリーンアーキテクチャで以下によく使われる
+  - バリデーション
+  - ポリシー差し替え
+  - ユースケースの振る舞い切り替え
+
+---
+
+### Function closures
+
+```go
+package main
+
+import "fmt"
+
+func adder() func(int) int {
+	sum := 0
+	return func(x int) int {
+		sum += x
+		return sum
+	}
+}
+
+func main() {
+	pos, neg := adder(), adder()
+	for i := 0; i < 10; i++ {
+		fmt.Println(
+			pos(i),
+			neg(-2*i),
+		)
+	}
+	fmt.Println(pos(1))
+}
+```
+
+実行結果：
+```
+0 0
+1 -2
+3 -6
+6 -12
+10 -20
+15 -30
+21 -42
+28 -56
+36 -72
+45 -90
+46
+```
+
+メモ：
+- Go の関数は クロージャ(外側の変数を捕まえて使う関数)になれる  
+- このコードでのクロージャは以下(sum を捕まえている無名関数)
+  ```go
+  func(x int) int {
+      sum += x
+      return sum
+  }
+	```
+- adder 自体はクロージャではなく、クロージャを生成して返す関数
+- sum := 0 は
+  - adder() を呼んだ瞬間に1回だけ初期化される
+	- クロージャを呼ぶたびに初期化されるわけではない
+- adder() を呼ぶたびに別の sum を持つクロージャが作られる
+- そのため pos と neg は独立した状態を持つ
+	```go
+	adder()
+	├─ sum = 0
+	└─ func(x) { sum += x }  ← クロージャ①（pos）
+
+	adder()
+	├─ sum = 0
+	└─ func(x) { sum += x }  ← クロージャ②（neg）
+	```
+- クロージャは「関数 + 捕まえた変数」のセット
+- 実務では設定や依存を閉じ込める用途は使って良いが、状態を持ち続ける用途は struct の方が無難
+
+---
+
 ### [未]Exercise: Fibonacci closure
 
 ---
