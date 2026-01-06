@@ -979,18 +979,287 @@ func main() {
 ---
 
 ## Methods and interfaces
-### [未]Methods and interfaces
-### [未]Methods
-### [未]Methods are functions
-### [未]Methods continued
-### [未]Pointer receivers
-### [未]Pointers and functions
+
+### Methods
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type Vertex struct {
+	X, Y float64
+}
+
+func (v Vertex) Abs() float64 {
+	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func main() {
+	v := Vertex{3, 4}
+	fmt.Println(v.Abs())
+}
+```
+
+実行結果：
+```
+5
+```
+
+メモ：
+- Goにクラスはない
+- 型に対してメソッドを定義できる（構造体以外にも独自型にも定義可能）
+- このコードでは `(v Vertex)` の部分がレシーバ
+- メソッドは `v.Abs()` のように呼べる
+- 「データ + 振る舞い」を表現するための仕組み
+
+---
+
+### [スキップ]Methods are functions
+
+---
+
+### Methods continued
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type MyFloat float64
+
+func (f MyFloat) Abs() float64 {
+	if f < 0 {
+		return float64(-f)
+	}
+	return float64(f)
+}
+
+func main() {
+	f := MyFloat(-math.Sqrt2)
+	fmt.Println(f.Abs())
+}
+```
+
+実行結果；
+```
+1.4142135623730951
+```
+
+
+メモ：
+- Goでは struct に限らず、自分で定義した任意の型 にメソッドを定義できる
+（数値型・スライス型・マップ型なども可）
+- メソッドは レシーバ付きの関数（型に「振る舞い（できること）」を与える仕組み）
+- メソッドを定義できるのは、その型が定義されたパッケージ内だけ。以下には直接メソッドを追加できない
+  - 他パッケージの型
+  - 組み込み型（int / float64 など）
+- 他人の型を拡張したい場合は、ラップ型を作る か embedding（合成）する
+
+---
+
+### Pointer receivers
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type Vertex struct {
+	X, Y float64
+}
+
+func (v Vertex) Abs() float64 {
+	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func (v *Vertex) Scale(f float64) {
+	v.X = v.X * f
+	v.Y = v.Y * f
+}
+
+func main() {
+	v := Vertex{3, 4}
+	v.Scale(10)
+	fmt.Println(v.Abs())
+}
+```
+
+実行結果：
+```
+50
+```
+
+メモ：
+- レシーバには2種類ある
+  ```go
+  func (v Vertex) Method()   // 値レシーバ（構造体のコピーを受け取る）
+  func (v *Vertex) Method()  // ポインタレシーバ（構造体そのものを指す）
+  ```
+- 値レシーバはコピーを操作するので呼び出し元に反映されない
+- ポインタレシーバは元の値を変更できる。状態を変更するメソッドでは必須
+- 実務ではポインタレシーバで統一されがち
+  - 状態を持つ構造体は変更される可能性が高い  
+  - 値／ポインタが混在すると理解コストが上がる  
+  - そのため すべてポインタレシーバにする設計 が多い  
+- パフォーマンス面の利点
+  - 大きな構造体を値レシーバにするとコピーコストが発生  
+  - ポインタレシーバならコピーなし  
+- 元の値を変更したいなら、必ずポインタレシーバ
+- Goのメソッドは値渡しが基本のため、構造体の状態を変更するメソッドはポインタレシーバを使う
+
+---
+
+### [スキップ]Pointers and functions
 ### [未]Methods and pointer indirection
 ### [未]Methods and pointer indirection (2)
 ### [未]Choosing a value or pointer receiver
-### [未]Interfaces
-### [未]Interfaces are implemented implicitly
-### [未]Interface values
+
+---
+
+### Interfaces
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type Abser interface {
+	Abs() float64
+}
+
+func main() {
+	var a Abser
+	f := MyFloat(-math.Sqrt2)
+	v := Vertex{3, 4}
+
+	a = f  // MyFloat は Abser を実装している
+	a = &v // *Vertex は Abser を実装している
+
+  // 次の行のように代入すると、v は Vertex 型であり（*Vertex ではないため）
+  // Abser インタフェースを実装しておらず、コンパイルエラーになる。
+	//a = v
+
+	fmt.Println(a.Abs())
+}
+
+type MyFloat float64
+
+func (f MyFloat) Abs() float64 {
+	if f < 0 {
+		return float64(-f)
+	}
+	return float64(f)
+}
+
+type Vertex struct {
+	X, Y float64
+}
+
+func (v *Vertex) Abs() float64 {
+	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+```
+
+実行結果：
+```
+5
+```
+
+メモ：
+- interface は メソッドのシグネチャ(名前・引数・戻り値)の集合
+- interface は 明示的に implements しない（暗黙実装）
+- interface 変数には要求メソッドをすべて持つ型の値だけ代入できる
+- interface の実装可否は`method set`（どのメソッドを **静的に** 持っているか）で判定される
+  - 型T と 型*T では method set が違う。
+  - メソッド呼び出し時に行われるポインタの自動補完（v.M() → (&v).M()）は、interface 実装判定では考慮されない
+  - そのため、上のコードでは
+    - MyFloat → コンパイル成功
+    - *Vertex → コンパイル成功
+    - Vertex → コンパイルエラー
+- 実務では `var i IFace = &Struct{}` が基本形
+  - （method set 問題を確実に回避できるため）
+
+---
+
+### [スキップ]Interfaces are implemented implicitly
+
+---
+
+### Interface values
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type I interface {
+	M()
+}
+
+type T struct {
+	S string
+}
+
+func (t *T) M() {
+	fmt.Println(t.S)
+}
+
+type F float64
+
+func (f F) M() {
+	fmt.Println(f)
+}
+
+func main() {
+	var i I
+
+	i = &T{"Hello"} // 内部的には (value = &T{"Hello"}, type = *T)
+	describe(i)
+	i.M()
+
+	i = F(math.Pi) // 内部的には (value = F(3.1415...), type = F)
+	describe(i)
+	i.M()
+}
+
+func describe(i I) {
+	fmt.Printf("(%v, %T)\n", i, i)
+}
+```
+
+実行結果：
+```
+(&{Hello}, *main.T)
+Hello
+(3.141592653589793, main.F)
+3.141592653589793
+```
+
+メモ：
+- interface の値は (値, 具体型) のペアで構成される
+- interface は 実行時にも具体型の情報を保持している
+- interface 変数には 異なる具体型の値を代入できる
+- interface のメソッド呼び出しは保持している具体型のメソッドが動的に呼ばれる
+- **同じ interface 変数でも、代入する値によって中身の具体型と振る舞いが変わる**
+  - この仕組みが 多態性（ポリモーフィズム）を実現している
+
+---
+
 ### [未]Interface values with nil underlying values
 ### [未]Nil interface values
 ### [未]The empty interface
