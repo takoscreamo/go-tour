@@ -1147,8 +1147,8 @@ func main() {
 	a = f  // MyFloat は Abser を実装している
 	a = &v // *Vertex は Abser を実装している
 
-  // 次の行のように代入すると、v は Vertex 型であり（*Vertex ではないため）
-  // Abser インタフェースを実装しておらず、コンパイルエラーになる。
+	// 次の行のように代入すると、v は Vertex 型であり（*Vertex ではないため）
+	// Abser インタフェースを実装しておらず、コンパイルエラーになる。
 	//a = v
 
 	fmt.Println(a.Abs())
@@ -1179,17 +1179,15 @@ func (v *Vertex) Abs() float64 {
 
 メモ：
 - interface は メソッドのシグネチャ(名前・引数・戻り値)の集合
-- interface は 明示的に implements しない（暗黙実装）
+- interface はGoでは明示的に implements しない（暗黙実装）
 - interface 変数には要求メソッドをすべて持つ型の値だけ代入できる
 - interface の実装可否は`method set`（どのメソッドを **静的に** 持っているか）で判定される
   - 型T と 型*T では method set が違う。
-  - メソッド呼び出し時に行われるポインタの自動補完（v.M() → (&v).M()）は、interface 実装判定では考慮されない
   - そのため、上のコードでは
-    - MyFloat → コンパイル成功
-    - *Vertex → コンパイル成功
-    - Vertex → コンパイルエラー
-- 実務では `var i IFace = &Struct{}` が基本形
-  - （method set 問題を確実に回避できるため）
+    - `a = f` （MyFloat 型） → コンパイル成功（`Abs()`メソッドを持っているため）
+    - `a = &v` （*Vertex 型） → コンパイル成功（`Abs()`メソッドを持っているため）
+    - `a = v` （Vertex 型） → コンパイルエラー（`Abs()`メソッドを持っていないため）
+- 実務では、ポインタレシーバを使うことで method set 問題を回避できるので、`var i IFace = &Struct{}` が基本形
 
 ---
 
