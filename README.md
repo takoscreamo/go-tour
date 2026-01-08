@@ -1258,12 +1258,97 @@ Hello
 
 ---
 
-### [未]Interface values with nil underlying values
-### [未]Nil interface values
-### [未]The empty interface
-### [未]Type assertions
-### [未]Type switches
+### Interface values with nil underlying values
+
+```go
+package main
+
+import "fmt"
+
+type I interface {
+	M()
+}
+
+type T struct {
+	S string
+}
+
+func (t *T) M() {
+	if t == nil { // interface の中の具体値が nil のケース
+		fmt.Println("<nil>")
+		return
+	}
+	fmt.Println(t.S)
+}
+
+func main() {
+	var i I     // 型も値も入っていない → interface は nil
+	describe(i) // (<nil>, <nil>) // 具体値がnil、型もnil
+	// i.M()    // 具体型が入っていないため、panicになる
+
+	var t *T // t は nil だが、*T という型情報が interface に入る
+	i = t
+	describe(i) // (<nil>, *main.T) // 具体値がnil、型が*main.T
+	i.M()       // <nil> // 型があるため、nil レシーバーとしてメソッドを呼び出せる。
+	            // if t == nil の条件に引っかかるため、<nil> が出力される
+
+	i = &T{"hello"}
+	describe(i) // (&{hello}, *main.T) // 具体値が&T{"hello"}、型が*main.T
+	i.M()       // hello // if t == nil の条件に引っ掛からずfmt.Println(t.S)が実行される
+}
+
+func describe(i I) {
+	fmt.Printf("(%v, %T)\n", i, i)
+}
+```
+
+実行結果：
+```
+(<nil>, <nil>)
+(<nil>, *main.T)
+<nil>
+(&{hello}, *main.T)
+hello
+```
+
+メモ：
+- interface は (具体型, 具体値) の2つの情報を内部に持っている
+- 型も値も nil のときだけ if i == nil が true
+- nil ポインタを interface に代入すると
+  - 具体型は入る
+  - 具体値は nil
+  - interface 自体は非 nil になる
+- そのため if i == nil が false になるケースがある
+- 具体値が nil でも メソッド呼び出しは可能（nil レシーバー）
+- interface（特に error）を返す関数は成功時に必ず return nil しないと事故りがち
+
+---
+
+### [スキップ]Nil interface values
+### [スキップ]The empty interface
+### [スキップ]Type assertions
+### [スキップ]Type switches
+
+---
+
 ### [未]Stringers
+
+```go
+
+```
+
+実行結果：
+```
+
+```
+
+メモ：
+- 
+
+
+---
+
+
 ### [未]Exercise: Stringers
 ### [未]Errors
 ### [未]Exercise: Errors
@@ -1272,6 +1357,104 @@ Hello
 ### [未]Exercise: rot1 3Reader
 ### [未]Images
 ### [未]Exercise: Images
+
+---
+
+## Generics
+- 日本語版にはまだ無いページっぽい（英語版:https://go.dev/tour/generics/1）
+
+### Type parameters
+
+```go
+package main
+
+import "fmt"
+
+// Index は s 内の x のインデックスを返す。見つからない場合は -1 を返す
+func Index[T comparable](s []T, x T) int {
+	for i, v := range s {
+		//  v と x はcomparable型 T なので、ここでは == を使用できる
+		if v == x {
+			return i
+		}
+	}
+	return -1
+}
+
+func main() {
+	// インデックスは int のスライスに対して機能する
+	si := []int{10, 20, 15, -10}
+	fmt.Println(Index(si, 15))
+
+	// インデックスは文字列のスライスに対しても機能する
+	ss := []string{"foo", "bar", "baz"}
+	fmt.Println(Index(ss, "hello"))
+}
+```
+
+実行結果：
+```
+2
+-1
+```
+
+メモ：
+- ジェネリクスとは、**型違いでコピペしていたコードを、1つにまとめるための仕組み**
+- Goのジェネリクス（Type Parameters）とは
+  - ジェネリクス = 型を引数として受け取る仕組み
+  - 実行時ではなく コンパイル時に型が確定する
+  - 型パラメータは関数名の直後に書く
+    ```go
+    func Foo[T any](...)
+    ```
+- 型パラメータと制約
+  - T は 型の変数
+  - any = 制約なし（= interface{} の別名）
+  - 制約（constraint）を書くことで使える演算・操作をコンパイラに保証させる
+- comparable
+  - comparable は `==` `!=` が使える型のみ許可
+  - OK: int, string, bool, pointer, comparableなstruct
+  - NG: slice, map, func
+  - 制約がないと比較演算子は使えない
+- 上のコードの例
+  - `Index`関数は比較可能な型のスライスから値を探す関数
+  - s と x は 必ず同じ型 T
+  - 型ごとに関数を量産しなくてよい(ジェネリクスの恩恵)
+- ジェネリクスと インターフェース の違い
+  - ジェネリクス: 型の抽象化（何の型か）
+  - インターフェース: 振る舞いの抽象化（何ができるか）
+  - ジェネリクスは静的（コンパイル時）
+  - インターフェース は動的（実行時）
+
+---
+
+## Generic types
+
+```go
+package main
+
+type List[T any] struct {
+	next *List[T]
+	val  T
+}
+
+func main() {
+}
+```
+
+実行結果：
+```
+出力なし
+```
+
+メモ：
+- ジェネリクスは 関数だけでなく構造体（struct）にも使える
+- T は struct 全体で共有される型パラメータ
+- フィールドにも T をそのまま使える
+  - 値保持用：val T
+  - 再帰参照：*List[T]
+- 上のコードでは型安全な再帰構造を作っている
+- 実務では自作することは少ない
 
 ---
 
