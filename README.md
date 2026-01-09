@@ -1331,31 +1331,101 @@ hello
 
 ---
 
-### [未]Stringers
+### Stringers
 
 ```go
+package main
 
+import "fmt"
+
+type Person struct {
+	Name string
+	Age  int
+}
+
+func (p Person) String() string {
+	return fmt.Sprintf("%v (%v years)", p.Name, p.Age)
+}
+
+func main() {
+	a := Person{"Arthur Dent", 42}
+	z := Person{"Zaphod Beeblebrox", 9001}
+	fmt.Println(a, z)
+}
 ```
 
 実行結果：
 ```
-
+Arthur Dent (42 years) Zaphod Beeblebrox (9001 years)
 ```
 
 メモ：
-- 
-
+- Stringer は fmt が表示用に使う超重要インターフェース
+- String() string を実装するだけで自動的に使われる
+- fmt.Println / fmt.Printf("%v") は Stringer を優先して表示する
+- 表示ロジックを型に閉じ込められる
+- ログ・デバッグ・ドメイン表現がきれいになる
+- Stringerで加工された表示ではなくプレーンな内部構造を見たいときは fmt.Printf の指定子（`%+v` `%#v`等）で切り替える
 
 ---
 
-
 ### [未]Exercise: Stringers
-### [未]Errors
+
+---
+
+### Errors
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+type MyError struct {
+	When time.Time
+	What string
+}
+
+func (e *MyError) Error() string {
+	return fmt.Sprintf("at %v, %s",
+		e.When, e.What)
+}
+
+func run() error {
+	return &MyError{
+		time.Now(),
+		"it didn't work",
+	}
+}
+
+func main() {
+	if err := run(); err != nil {
+		fmt.Println(err)
+	}
+}
+```
+
+実行結果：
+```
+at 2026-01-09 11:54:35.282602 +0900 JST m=+0.000180501, it didn't work
+```
+
+メモ：
+- error は Stringerと同様にただのインタフェース
+- 独自エラー型は `struct + Error()` で作る
+- Goでのエラーハンドリングは、例外（try/catch）を使わず、「値としてエラーを返す」 という設計
+  - `err != nil` が失敗 / `err == nil` が成功
+- fmt は Error() を自動で呼ぶ（error → Stringer → デフォルト表示 の順）
+
+---
+
 ### [未]Exercise: Errors
 ### [未]Readers
 ### [未]Exercise: Readers
 ### [未]Exercise: rot1 3Reader
-### [未]Images
+### [スキップ]Images
 ### [未]Exercise: Images
 
 ---
