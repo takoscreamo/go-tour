@@ -1,4 +1,5 @@
-実務でGoを扱うので、[A Tour of Go](https://go-tour-jp.appspot.com/) を写経しながら、ポイントをまとめました。
+実務でGoを扱うので、[A Tour of Go](https://go-tour-jp.appspot.com/) を写経しながらポイントをまとめました。  
+演習ページや重要度の低いページはスキップしてます。  
 
 ---
 **目次**
