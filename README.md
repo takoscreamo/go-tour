@@ -1,6 +1,4 @@
-
-実務でGoを扱うので、[A Tour of Go](https://go-tour-jp.appspot.com/) を写経しながら、ポイントをまとめました。  
-演習ページや重要度の低いページはスキップしてます。
+実務でGoを扱うので、[A Tour of Go](https://go-tour-jp.appspot.com/) を写経しながら、ポイントをまとめました。
 
 ---
 **目次**
@@ -13,82 +11,44 @@
 	- [Functions continued](#functions-continued)
 	- [Multiple results](#multiple-results)
 	- [Named return values](#named-return-values)
-	- [\[スキップ\]Variables](#スキップvariables)
-	- [\[スキップ\]Variables with initializers](#スキップvariables-with-initializers)
 	- [Short variable declarations](#short-variable-declarations)
-	- [\[スキップ\]Basic types](#スキップbasic-types)
 	- [Zero values](#zero-values)
-	- [\[スキップ\]Type conversions](#スキップtype-conversions)
-	- [\[スキップ\]Type inference](#スキップtype-inference)
 	- [Constants](#constants)
-	- [\[スキップ\]Numeric Constants](#スキップnumeric-constants)
 - [Flow control statements: for, if, else, switch and defer](#flow-control-statements-for-if-else-switch-and-defer)
 	- [For](#for)
-	- [\[スキップ\]For continued](#スキップfor-continued)
-	- [\[スキップ\]For is Go's "while"](#スキップfor-is-gos-while)
-	- [\[スキップ\]Forever](#スキップforever)
 	- [If](#if)
-	- [\[スキップ\]If with a short statement](#スキップif-with-a-short-statement)
-	- [\[スキップ\]If and else](#スキップif-and-else)
-	- [\[スキップ\]Exercise: Loops and Functions](#スキップexercise-loops-and-functions)
 	- [Switch](#switch)
-	- [\[スキップ\]Switch evaluation order](#スキップswitch-evaluation-order)
-	- [\[スキップ\]Switch with no condition](#スキップswitch-with-no-condition)
 	- [Defer](#defer)
 	- [Stacking defers](#stacking-defers)
 - [More types: structs, slices, and maps.](#more-types-structs-slices-and-maps)
 	- [Pointers](#pointers)
 	- [Structs](#structs)
-	- [\[スキップ\]Struct Fields](#スキップstruct-fields)
 	- [Pointers to structs](#pointers-to-structs)
-	- [\[スキップ\]Struct Literals](#スキップstruct-literals)
 	- [Arrays](#arrays)
 	- [Slices](#slices)
 	- [Slices are like references to arrays](#slices-are-like-references-to-arrays)
-	- [\[スキップ\]Slice literals](#スキップslice-literals)
-	- [\[スキップ\]Slice defaults](#スキップslice-defaults)
 	- [Slice length and capacity](#slice-length-and-capacity)
 	- [Nil slices](#nil-slices)
 	- [Creating a slice with make](#creating-a-slice-with-make)
-	- [\[スキップ\]Slices of slices](#スキップslices-of-slices)
 	- [Appending to a slice](#appending-to-a-slice)
 	- [Range](#range)
 	- [Range continued](#range-continued)
-	- [\[スキップ\]Exercise: Slices](#スキップexercise-slices)
 	- [Maps](#maps)
-	- [\[スキップ\]Map literals](#スキップmap-literals)
-	- [\[スキップ\]Map literals continued](#スキップmap-literals-continued)
 	- [Mutating Maps](#mutating-maps)
-	- [\[スキップ\]Exercise: Maps](#スキップexercise-maps)
 	- [Function values](#function-values)
 	- [Function closures](#function-closures)
-	- [\[スキップ\]Methods are functions](#スキップmethods-are-functions)
+- [Methods and interfaces](#methods-and-interfaces)
+	- [Methods](#methods)
 	- [Methods continued](#methods-continued)
 	- [Pointer receivers](#pointer-receivers)
-	- [\[スキップ\]Pointers and functions](#スキップpointers-and-functions)
-	- [\[スキップ\]Methods and pointer indirection](#スキップmethods-and-pointer-indirection)
-	- [\[スキップ\]Methods and pointer indirection (2)](#スキップmethods-and-pointer-indirection-2)
-	- [\[スキップ\]Choosing a value or pointer receiver](#スキップchoosing-a-value-or-pointer-receiver)
 	- [Interfaces](#interfaces)
-	- [\[スキップ\]Interfaces are implemented implicitly](#スキップinterfaces-are-implemented-implicitly)
 	- [Interface values](#interface-values)
 	- [Interface values with nil underlying values](#interface-values-with-nil-underlying-values)
-	- [\[スキップ\]Nil interface values](#スキップnil-interface-values)
-	- [\[スキップ\]The empty interface](#スキップthe-empty-interface)
-	- [\[スキップ\]Type assertions](#スキップtype-assertions)
-	- [\[スキップ\]Type switches](#スキップtype-switches)
 	- [Stringers](#stringers)
-	- [\[スキップ\]Exercise: Stringers](#スキップexercise-stringers)
 	- [Errors](#errors)
-	- [\[スキップ\]Exercise: Errors](#スキップexercise-errors)
-	- [\[スキップ\]Readers](#スキップreaders)
-	- [\[スキップ\]Exercise: Readers](#スキップexercise-readers)
-	- [\[スキップ\]Exercise: rot1 3Reader](#スキップexercise-rot1-3reader)
-	- [\[スキップ\]Images](#スキップimages)
-	- [\[スキップ\]Exercise: Images](#スキップexercise-images)
 - [Generics](#generics)
 	- [Type parameters](#type-parameters)
-- [Generic types](#generic-types)
+	- [Generic types](#generic-types)
 - [Concurrency](#concurrency)
 	- [Goroutines](#goroutines)
 	- [Channels](#channels)
@@ -96,10 +56,7 @@
 	- [Range and Close](#range-and-close)
 	- [Select](#select)
 	- [Default Selection](#default-selection)
-	- [\[スキップ\]Exercise: Equivalent Binary Trees](#スキップexercise-equivalent-binary-trees)
-	- [\[スキップ\]Exercise: Equivalent Binary Trees](#スキップexercise-equivalent-binary-trees-1)
 	- [sync.Mutex](#syncmutex)
-	- [\[スキップ\]Exercise: Web Crawler](#スキップexercise-web-crawler)
 
 ---
 
@@ -121,7 +78,7 @@ func main() {
 Hello, 世界
 ```
 
-メモ：
+ポイント：
 - Go のプログラムは `package main` と `func main()` が必要
 - gofmtがgo標準でインストールされているので、ファイルを保存すると自動でコードを整形してくれる
 - ビルドは `go build ＜ファイル名＞`
@@ -150,7 +107,7 @@ func main() {
 My favorite number is 6
 ```
 
-メモ：
+ポイント：
 - すべての Go ファイルは先頭に package 文を書く
 - 同じディレクトリの .go ファイルは原則すべて同じ package 名にしなければならない
 - ディレクトリ名とパッケージ名は慣習的に一致させるが、仕様上は一致必須ではない
@@ -179,7 +136,7 @@ func main() {
 Now you have 2.6457513110645907 problems.
 ```
 
-メモ：
+ポイント：
 - `import` で複数パッケージをまとめてインポート
 - 1行ずつ書くこともできるが、Go のコードスタイルではまとめて書くことが推奨されている
 
@@ -207,7 +164,7 @@ func main() {
 3.141592653589793
 ```
 
-メモ：
+ポイント：
 - Goでは、名前の最初の文字で、公開される範囲が決まる
 - 大文字で始まる名前 = エクスポート（公開）
   - 外部パッケージから参照可能
@@ -240,7 +197,7 @@ func main() {
 55
 ```
 
-メモ：
+ポイント：
 - Goでは引数で、変数名の 後ろ に型名を書く
   - 例：`add(x int)`
 
@@ -262,12 +219,12 @@ func main() {
 }
 ```
 
-実行結果；
+実行結果：
 ```
 55
 ```
 
-メモ：
+ポイント：
 - 引数の型を省略してまとめて書くことができる `(x, y int)`
 - 実務でも2~3個の引数が同じ型ならまとめて可読性上げることもある
 - 4つ以上の場合は構造体を定義して、構造体を引数にした方が無難
@@ -297,7 +254,7 @@ func main() {
 world hello
 ```
 
-メモ：
+ポイント：
 - Goは複数の戻り値を返すことができる
 - 特に以下のように、関数の戻り値を `value, err` で返す書き方はGoのベストプラクティス
     ```
@@ -334,7 +291,7 @@ func main() {
 7 10
 ```
 
-メモ：
+ポイント：
 - Goでは戻り値となる変数に名前をつけることができる
 - 名前付きの戻り値の変数を使うと、returnで何も書かずに戻せる
 - 短い関数以外では使わない方が良い
@@ -342,10 +299,6 @@ func main() {
 
 ---
 
-### [スキップ]Variables
-### [スキップ]Variables with initializers
-
----
 ### Short variable declarations
 ```go
 package main
@@ -366,16 +319,12 @@ func main() {
 1 2 3 true false no!
 ```
 
-メモ：
+ポイント：
 - Goでは`var i int = 10`という書き方で変数宣言もできる
 - `i := 10`という代入文を使って暗黙的な型宣言もできる
 - 関数内では`:=`を積極的に使うべき
 - 関数外と、明示的に型指定したい場合に`var`を使う(int64、float64、構造体ゼロ値など)
 
-
----
-
-### [スキップ]Basic types
 
 ---
 
@@ -399,7 +348,7 @@ func main() {
 0 0 false ""
 ```
 
-メモ：
+ポイント：
 - 初期値を与えずに変数宣言すると以下のゼロ値が入る
   - 数値型(int,floatなど): `0`
   - bool型: `false`
@@ -412,11 +361,6 @@ func main() {
 - ゼロ値を使うべきではないシーン
   - map のように ゼロ値(nil)だと使えずエラーにつながるもの
 
-
----
-
-### [スキップ]Type conversions
-### [スキップ]Type inference
 
 ---
 
@@ -446,7 +390,7 @@ Happy 3.14 Day
 Go rules? true
 ```
 
-メモ：
+ポイント：
 - const は 変わらない値 を表す
 - := では宣言できない（const x = 1）
 - 使える型は 数値・文字列・bool のみ
@@ -469,12 +413,8 @@ Go rules? true
 - マジックナンバーを消すためにも使う
 - 設計上の 「不変」という意図を表現できる
 
-
 ---
 
-### [スキップ]Numeric Constants
-
----
 ## Flow control statements: for, if, else, switch and defer
 
 ### For
@@ -498,19 +438,13 @@ func main() {
 45
 ```
 
-メモ：
+ポイント：
 - Go のループ構文は `for` だけ（`while` / `do-while` はない）
 - 基本形は `for 初期化; 条件; 後処理 { }`
 - `()` は不要、`{}` は必須
 - `for i := 0; ...` の変数は for のスコープ内のみ有効
 - 条件が false になるとループ終了
 - 無限ループは `for {}` で書く
-
----
-
-### [スキップ]For continued
-### [スキップ]For is Go's "while"
-### [スキップ]Forever
 
 ---
 
@@ -542,7 +476,7 @@ func main() {
 
 ```
 
-メモ：
+ポイント：
 - IFは `if 条件 { }` が基本形。`()` は不要、`{}` は必須
 - 条件式は bool 型のみ（数値や nil は不可）
 - if の前で 短縮変数宣言ができる
@@ -552,13 +486,6 @@ func main() {
 - その変数のスコープは if / else 内のみ
 - else if / else が使える
 - else は 必ず直前の if の } と同じ行
-
-
----
-
-### [スキップ]If with a short statement
-### [スキップ]If and else
-### [スキップ]Exercise: Loops and Functions
 
 ---
 
@@ -592,7 +519,7 @@ func main() {
 Go runs on Linux.
 ```
 
-メモ：
+ポイント：
 - `switch` は `if-else` の簡潔な書き方
 - 他の言語と異なり、自動で `break` する（次のcaseに行かない）
   - `fallthrough`構文はあるが、次の case の条件を評価せずに本体を実行するため注意が必要
@@ -602,12 +529,6 @@ Go runs on Linux.
 - switch で 短縮変数宣言ができる（if同様）
 - `switch {}` で if 代わりに使える（if-else より 読みやすく条件分岐の「列挙」に向いている）
 - default は省略可
-
-
----
-
-### [スキップ]Switch evaluation order
-### [スキップ]Switch with no condition
 
 ---
 
@@ -631,7 +552,7 @@ hello
 world
 ```
 
-メモ：
+ポイント：
 - defer は、指定した関数の実行を呼び出し元の関数終了直前まで遅延させる
 - defer に渡した 関数の引数は、その場ですぐ評価される
   - 以下例がわかりやすい
@@ -698,7 +619,7 @@ done
 1
 ```
 
-メモ：
+ポイント：
 - このコードの実行順序
   - 1.`fmt.Println("counting")` → `counting`
   - 2.for ループで `i = 0..9` の defer が積まれる
@@ -724,6 +645,7 @@ done
   - 意図した値を出すには 変数をコピーする か クロージャに引数として渡す
 
 ---
+
 ## More types: structs, slices, and maps.
 
 ### Pointers
@@ -753,7 +675,7 @@ func main() {
 1
 ```
 
-メモ：
+ポイント：
 | 記法 | 意味 |
 | --- | --- |
 | `&i` | 変数i のアドレスを取得する |
@@ -787,7 +709,7 @@ func main() {
 {1 2}
 ```
 
-メモ：
+ポイント：
 - struct (構造体)は、フィールドの集まり
 - `type 名前 =? 型定義` の構文で型に名前をつける。構造体以外でも使う。
   - 構造体：`type A struct {}`
@@ -796,10 +718,6 @@ func main() {
   - 関数：`type Fn func()`
   - スライス/マップ：`type IDs []int`
 
-
----
-
-### [スキップ]Struct Fields
 
 ---
 
@@ -828,14 +746,10 @@ func main() {
 {1000000000 2}
 ```
 
-メモ：
+ポイント：
 - structのフィールドは、structのポインタを通してアクセスすることもできる
 - `p.X`でアクセスできる
    - ちなみに`(*p).X`と書くことでアクセスもできるが長いのであまり使われない
-
----
-
-### [スキップ]Struct Literals
 
 ---
 
@@ -865,7 +779,7 @@ Hello World
 [2 3 5 7 11 13]
 ```
 
-メモ：
+ポイント：
 - Goの配列は固定長
 - [n]T は型 T の長さ n の配列を表す
 - 配列の長さは型の一部で、後から変更できない
@@ -894,7 +808,7 @@ func main() {
 [3 5 7]
 ```
 
-メモ：
+ポイント：
 - Goでは、配列`[n]int`は固定長。スライス`[]int`は可変長。
 
 
@@ -935,17 +849,12 @@ func main() {
 [John XXX George Ringo]
 ```
 
-メモ：
+ポイント：
 - スライスは配列そのものを持たず、配列の一部を“参照”している
 - スライス同士が同じ配列を共有することがある
 - どれか1つのスライスを変更すると、配列・他のスライスにも影響する
 - コピーしたい場合は`copy()`か`append()`を使う
 
-
----
-
-### [スキップ]Slice literals
-### [スキップ]Slice defaults
 
 ---
 
@@ -982,7 +891,7 @@ len=4 cap=6 [2 3 5 7]
 len=2 cap=4 [5 7]
 ```
 
-メモ：
+ポイント：
 - スライスは長さ(length)と容量(capacity)の両方を持っている
 - 長さ(length)とは
   - `len(s)`で取得できる
@@ -1023,7 +932,7 @@ nil!
 ```
 
 
-メモ：
+ポイント：
 - スライスのゼロ値は `nil`
 - ただし`Println`の表示では空配列と同じく`[]`で表示される
     ```
@@ -1072,7 +981,7 @@ c len=2 cap=5 [0 0]
 d len=3 cap=3 [0 0 0]
 ```
 
-メモ：
+ポイント：
 - make([]T, len, cap) は 配列を確保し、その配列を参照するスライスを作る
 - len は「今使っている長さ」、cap は「将来使える余白」
 - cap を指定することで append 時の再確保を防げる
@@ -1082,10 +991,6 @@ d len=3 cap=3 [0 0 0]
 - `[i:j]` →「i から j-1 まで見る」
 - パッと見て分かりづらいのでまとめ直したい
 
-
----
-
-### [スキップ]Slices of slices
 
 ---
 
@@ -1123,7 +1028,7 @@ len=2 cap=2 [0 1]
 len=5 cap=6 [0 1 2 3 4]
 ```
 
-メモ：
+ポイント：
 - `append`はスライスに要素を追加する関数
   - 厳密には「新しいスライスを返す関数」
   - `cap`が足りなければ配列を作り直す
@@ -1163,7 +1068,7 @@ func main() {
 2**7 = 128
 ```
 
-メモ：
+ポイント：
 - Goの`for + range`は、PHP等の`foreach`とほぼ同じ
 - `for + range`は値コピーなので元の値(pow)が書き換えられない
   - PHPもデフォルトは値コピー。オプションで参照にもできるが基本使わないのでほぼ同じと考えてOK
@@ -1203,17 +1108,13 @@ func main() {
 512
 ```
 
-メモ：
+ポイント：
 - `for i, _ := range slice` → 値を捨てる
 - `for _, value := range slice` → インデックスを捨てる
 - `for i := range slice` → 値を使わずインデックスだけ使う
 - `_` は「使わない変数」を表す特殊識別子
 
 
-
----
-
-### [スキップ]Exercise: Slices
 
 ---
 
@@ -1244,17 +1145,12 @@ func main() {
 {40.68433 -74.39967}
 ```
 
-メモ：
+ポイント：
 - Goの連想配列は`map`
 - mapのゼロ値は `nil`
 - PHPと異なり、`make`しないと要素追加できない(宣言だけでは使えない)
 - Goのmapは型安全なのでキーごとに異なる型の値は入れられない(PHPは入れられる)
 
-
----
-
-### [スキップ]Map literals
-### [スキップ]Map literals continued
 
 ---
 
@@ -1290,16 +1186,12 @@ The value: 0
 The value: 0 Present? false
 ```
 
-メモ：
+ポイント：
 - mapは 存在しないキーでもゼロ値が返る
 - 存在確認が必要な場合は必ず ok を使う
   - valueはゼロ値が入るため存在確認に使えない
 - 追加・更新・削除は安全で、存在しないキーに対する操作でもpanicしない
 
-
----
-
-### [スキップ]Exercise: Maps
 
 ---
 
@@ -1350,7 +1242,7 @@ func main() {
 81
 ```
 
-メモ：
+ポイント：
 - Go では 関数も値（変数）として扱える
 - 関数は
   - 変数に代入できる
@@ -1407,7 +1299,7 @@ func main() {
 46
 ```
 
-メモ：
+ポイント：
 - Go の関数は クロージャ(外側の変数を捕まえて使う関数)になれる  
 - このコードでのクロージャは以下(sum を捕まえている無名関数)
   ```go
@@ -1436,9 +1328,6 @@ func main() {
 
 ---
 
-### [スキップ]Exercise: Fibonacci closure
-
----
 
 ## Methods and interfaces
 
@@ -1470,16 +1359,12 @@ func main() {
 5
 ```
 
-メモ：
+ポイント：
 - Goにクラスはない
 - 型に対してメソッドを定義できる（構造体以外にも独自型にも定義可能）
 - このコードでは `(v Vertex)` の部分がレシーバ
 - メソッドは `v.Abs()` のように呼べる
 - 「データ + 振る舞い」を表現するための仕組み
-
----
-
-### [スキップ]Methods are functions
 
 ---
 
@@ -1508,13 +1393,13 @@ func main() {
 }
 ```
 
-実行結果；
+実行結果：
 ```
 1.4142135623730951
 ```
 
 
-メモ：
+ポイント：
 - Goでは struct に限らず、自分で定義した任意の型 にメソッドを定義できる
 （数値型・スライス型・マップ型なども可）
 - メソッドは レシーバ付きの関数（型に「振る舞い（できること）」を与える仕組み）
@@ -1560,7 +1445,7 @@ func main() {
 50
 ```
 
-メモ：
+ポイント：
 - レシーバには2種類ある
   ```go
   func (v Vertex) Method()   // 値レシーバ（構造体のコピーを受け取る）
@@ -1577,13 +1462,6 @@ func main() {
   - ポインタレシーバならコピーなし  
 - 元の値を変更したいなら、必ずポインタレシーバ
 - Goのメソッドは値渡しが基本のため、構造体の状態を変更するメソッドはポインタレシーバを使う
-
----
-
-### [スキップ]Pointers and functions
-### [スキップ]Methods and pointer indirection
-### [スキップ]Methods and pointer indirection (2)
-### [スキップ]Choosing a value or pointer receiver
 
 ---
 
@@ -1639,7 +1517,7 @@ func (v *Vertex) Abs() float64 {
 5
 ```
 
-メモ：
+ポイント：
 - interface は メソッドのシグネチャ(名前・引数・戻り値)の集合
 - interface はGoでは明示的に implements しない（暗黙実装）
 - interface 変数には要求メソッドをすべて持つ型の値だけ代入できる
@@ -1650,10 +1528,6 @@ func (v *Vertex) Abs() float64 {
     - `a = &v` （*Vertex 型） → コンパイル成功（`Abs()`メソッドを持っているため）
     - `a = v` （Vertex 型） → コンパイルエラー（`Abs()`メソッドを持っていないため）
 - 実務では、ポインタレシーバを使うことで method set 問題を回避できるので、`var i IFace = &Struct{}` が基本形
-
----
-
-### [スキップ]Interfaces are implemented implicitly
 
 ---
 
@@ -1710,7 +1584,7 @@ Hello
 3.141592653589793
 ```
 
-メモ：
+ポイント：
 - interface の値は (値, 具体型) のペアで構成される
 - interface は 実行時にも具体型の情報を保持している
 - interface 変数には 異なる具体型の値を代入できる
@@ -1773,7 +1647,7 @@ func describe(i I) {
 hello
 ```
 
-メモ：
+ポイント：
 - interface は (具体型, 具体値) の2つの情報を内部に持っている
 - 型も値も nil のときだけ if i == nil が true
 - nil ポインタを interface に代入すると
@@ -1783,13 +1657,6 @@ hello
 - そのため if i == nil が false になるケースがある
 - 具体値が nil でも メソッド呼び出しは可能（nil レシーバー）
 - interface（特に error）を返す関数は成功時に必ず return nil しないと事故りがち
-
----
-
-### [スキップ]Nil interface values
-### [スキップ]The empty interface
-### [スキップ]Type assertions
-### [スキップ]Type switches
 
 ---
 
@@ -1821,17 +1688,13 @@ func main() {
 Arthur Dent (42 years) Zaphod Beeblebrox (9001 years)
 ```
 
-メモ：
+ポイント：
 - Stringer は fmt が表示用に使う超重要インターフェース
 - String() string を実装するだけで自動的に使われる
 - fmt.Println / fmt.Printf("%v") は Stringer を優先して表示する
 - 表示ロジックを型に閉じ込められる
 - ログ・デバッグ・ドメイン表現がきれいになる
 - Stringerで加工された表示ではなくプレーンな内部構造を見たいときは fmt.Printf の指定子（`%+v` `%#v`等）で切り替える
-
----
-
-### [スキップ]Exercise: Stringers
 
 ---
 
@@ -1874,21 +1737,12 @@ func main() {
 at 2026-01-09 11:54:35.282602 +0900 JST m=+0.000180501, it didn't work
 ```
 
-メモ：
+ポイント：
 - error は Stringerと同様にただのインタフェース
 - 独自エラー型は `struct + Error()` で作る
 - Goでのエラーハンドリングは、例外（try/catch）を使わず、「値としてエラーを返す」 という設計
   - `err != nil` が失敗 / `err == nil` が成功
 - fmt は Error() を自動で呼ぶ（error → Stringer → デフォルト表示 の順）
-
----
-
-### [スキップ]Exercise: Errors
-### [スキップ]Readers
-### [スキップ]Exercise: Readers
-### [スキップ]Exercise: rot1 3Reader
-### [スキップ]Images
-### [スキップ]Exercise: Images
 
 ---
 
@@ -1930,7 +1784,7 @@ func main() {
 -1
 ```
 
-メモ：
+ポイント：
 - ジェネリクスとは、**型違いでコピペしていたコードを、1つにまとめるための仕組み**
 - Goのジェネリクス（Type Parameters）とは
   - ジェネリクス = 型を引数として受け取る仕組み
@@ -1960,7 +1814,7 @@ func main() {
 
 ---
 
-## Generic types
+### Generic types
 
 ```go
 package main
@@ -1979,7 +1833,7 @@ func main() {
 出力なし
 ```
 
-メモ：
+ポイント：
 - ジェネリクスは 関数だけでなく構造体（struct）にも使える
 - T は struct 全体で共有される型パラメータ
 - フィールドにも T をそのまま使える
@@ -2028,7 +1882,7 @@ world
 hello
 ```
 
-メモ：
+ポイント：
 - goroutine（ゴルーチン）は、Goのランタイムに管理される軽量な実行単位
   - OSスレッドそのものではない
   - Goランタイムが必要に応じてOSスレッドに割り当てる（goroutine は OSスレッドの上に乗っている）
@@ -2089,7 +1943,7 @@ func main() {
 -5 17 12
 ```
 
-メモ：
+ポイント：
 - チャネルは goroutine 間で値を受け渡す通り道
 - `ch <- v` // v をチャネル ch へ送信する
 - `v := <-ch` // ch から受信した変数を v へ割り当てる
@@ -2157,7 +2011,7 @@ func main() {
 3
 ```
 
-メモ：
+ポイント：
 - バッファ付きチャネルは 値を一時的に溜めるキュー
 - `ch := make(chan int, 2)` でmake の２つ目の引数にバッファの長さを与える
 - 送信（ch <- v）のルール
@@ -2200,7 +2054,7 @@ func main() {
 
 ```
 
-メモ：
+ポイント：
 - close(ch) は「これ以上値を送らない」という終了通知
 - チャネルを close しても受信は可能（送信は不可・panicになる）
 - close すべきなのは送信側。受信側が close すると設計破綻しやすい
@@ -2276,7 +2130,7 @@ func main() {
 quit
 ```
 
-メモ：
+ポイント：
 - 各チャネルの役割（ややこしいので先に整理）
   - `c`チャネル は値（データ）を流すためのチャネル
     - 送信側：fibonacci
@@ -2370,7 +2224,7 @@ tick.
 BOOM!
 ```
 
-メモ：
+ポイント：
 - select は 複数のチャネル操作を同時に待つ制御構文
 - 実行可能な case が1つでもあれば、それが選ばれる
 - default を書くと
@@ -2380,11 +2234,6 @@ BOOM!
   - ポーリング / ゲームループ / 監視処理 に使われる
   - sleep なしだと CPU を浪費する
 - time.Tick / time.After は「時間イベントを流すチャネル」
-
----
-
-### [スキップ]Exercise: Equivalent Binary Trees
-### [スキップ]Exercise: Equivalent Binary Trees
 
 ---
 
@@ -2437,7 +2286,7 @@ func main() {
 1000
 ```
 
-メモ：
+ポイント：
 - goroutine は軽量で簡単に並行実行できるが、共有データへの同時アクセスは自動では安全（ゴルーチンセーフ）にならない
 - goroutine 間で 共有変数を安全に扱うために排他制御が必要
 - 排他制御（mutual exclusion）を実現する仕組みが Mutex
@@ -2447,11 +2296,6 @@ func main() {
 - Lock と Unlock は必ずペアで使う
 - `defer mu.Unlock()` を使うと Unlock 漏れを防げる
 - 読み取り（参照）だけでも Lock が必要
-- goroutine 間で「通知・受け渡し・停止」を表現したい場合はチャネルが向くが、
-単に共有データを安全に守りたい場合は Mutex が最適
-
----
-
-### [スキップ]Exercise: Web Crawler
+- goroutine 間で「通知・受け渡し・停止」を表現したい場合はチャネルが向くが、単に共有データを安全に守りたい場合は Mutex が最適
 
 ---
