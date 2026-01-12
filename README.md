@@ -1,6 +1,105 @@
 
-実務でGoを扱うので、改めて [A Tour of Go](https://go-tour-jp.appspot.com/) を写経しながら、自分用メモとして更新していく。  
-初めは頭から書いてたけどやっぱり重要そうなところを先に網羅する。
+実務でGoを扱うので、[A Tour of Go](https://go-tour-jp.appspot.com/) を写経しながら、ポイントをまとめました。  
+演習ページや重要度の低いページはスキップしてます。
+
+---
+**目次**
+- [Basic](#basic)
+	- [Hello, World](#hello-world)
+	- [Packages](#packages)
+	- [Imports](#imports)
+	- [Exported names](#exported-names)
+	- [Functions](#functions)
+	- [Functions continued](#functions-continued)
+	- [Multiple results](#multiple-results)
+	- [Named return values](#named-return-values)
+	- [\[スキップ\]Variables](#スキップvariables)
+	- [\[スキップ\]Variables with initializers](#スキップvariables-with-initializers)
+	- [Short variable declarations](#short-variable-declarations)
+	- [\[スキップ\]Basic types](#スキップbasic-types)
+	- [Zero values](#zero-values)
+	- [\[スキップ\]Type conversions](#スキップtype-conversions)
+	- [\[スキップ\]Type inference](#スキップtype-inference)
+	- [Constants](#constants)
+	- [\[スキップ\]Numeric Constants](#スキップnumeric-constants)
+- [Flow control statements: for, if, else, switch and defer](#flow-control-statements-for-if-else-switch-and-defer)
+	- [For](#for)
+	- [\[スキップ\]For continued](#スキップfor-continued)
+	- [\[スキップ\]For is Go's "while"](#スキップfor-is-gos-while)
+	- [\[スキップ\]Forever](#スキップforever)
+	- [If](#if)
+	- [\[スキップ\]If with a short statement](#スキップif-with-a-short-statement)
+	- [\[スキップ\]If and else](#スキップif-and-else)
+	- [\[スキップ\]Exercise: Loops and Functions](#スキップexercise-loops-and-functions)
+	- [Switch](#switch)
+	- [\[スキップ\]Switch evaluation order](#スキップswitch-evaluation-order)
+	- [\[スキップ\]Switch with no condition](#スキップswitch-with-no-condition)
+	- [Defer](#defer)
+	- [Stacking defers](#stacking-defers)
+- [More types: structs, slices, and maps.](#more-types-structs-slices-and-maps)
+	- [Pointers](#pointers)
+	- [Structs](#structs)
+	- [\[スキップ\]Struct Fields](#スキップstruct-fields)
+	- [Pointers to structs](#pointers-to-structs)
+	- [\[スキップ\]Struct Literals](#スキップstruct-literals)
+	- [Arrays](#arrays)
+	- [Slices](#slices)
+	- [Slices are like references to arrays](#slices-are-like-references-to-arrays)
+	- [\[スキップ\]Slice literals](#スキップslice-literals)
+	- [\[スキップ\]Slice defaults](#スキップslice-defaults)
+	- [Slice length and capacity](#slice-length-and-capacity)
+	- [Nil slices](#nil-slices)
+	- [Creating a slice with make](#creating-a-slice-with-make)
+	- [\[スキップ\]Slices of slices](#スキップslices-of-slices)
+	- [Appending to a slice](#appending-to-a-slice)
+	- [Range](#range)
+	- [Range continued](#range-continued)
+	- [\[スキップ\]Exercise: Slices](#スキップexercise-slices)
+	- [Maps](#maps)
+	- [\[スキップ\]Map literals](#スキップmap-literals)
+	- [\[スキップ\]Map literals continued](#スキップmap-literals-continued)
+	- [Mutating Maps](#mutating-maps)
+	- [\[スキップ\]Exercise: Maps](#スキップexercise-maps)
+	- [Function values](#function-values)
+	- [Function closures](#function-closures)
+	- [\[スキップ\]Methods are functions](#スキップmethods-are-functions)
+	- [Methods continued](#methods-continued)
+	- [Pointer receivers](#pointer-receivers)
+	- [\[スキップ\]Pointers and functions](#スキップpointers-and-functions)
+	- [\[スキップ\]Methods and pointer indirection](#スキップmethods-and-pointer-indirection)
+	- [\[スキップ\]Methods and pointer indirection (2)](#スキップmethods-and-pointer-indirection-2)
+	- [\[スキップ\]Choosing a value or pointer receiver](#スキップchoosing-a-value-or-pointer-receiver)
+	- [Interfaces](#interfaces)
+	- [\[スキップ\]Interfaces are implemented implicitly](#スキップinterfaces-are-implemented-implicitly)
+	- [Interface values](#interface-values)
+	- [Interface values with nil underlying values](#interface-values-with-nil-underlying-values)
+	- [\[スキップ\]Nil interface values](#スキップnil-interface-values)
+	- [\[スキップ\]The empty interface](#スキップthe-empty-interface)
+	- [\[スキップ\]Type assertions](#スキップtype-assertions)
+	- [\[スキップ\]Type switches](#スキップtype-switches)
+	- [Stringers](#stringers)
+	- [\[スキップ\]Exercise: Stringers](#スキップexercise-stringers)
+	- [Errors](#errors)
+	- [\[スキップ\]Exercise: Errors](#スキップexercise-errors)
+	- [\[スキップ\]Readers](#スキップreaders)
+	- [\[スキップ\]Exercise: Readers](#スキップexercise-readers)
+	- [\[スキップ\]Exercise: rot1 3Reader](#スキップexercise-rot1-3reader)
+	- [\[スキップ\]Images](#スキップimages)
+	- [\[スキップ\]Exercise: Images](#スキップexercise-images)
+- [Generics](#generics)
+	- [Type parameters](#type-parameters)
+- [Generic types](#generic-types)
+- [Concurrency](#concurrency)
+	- [Goroutines](#goroutines)
+	- [Channels](#channels)
+	- [Buffered Channels](#buffered-channels)
+	- [Range and Close](#range-and-close)
+	- [Select](#select)
+	- [Default Selection](#default-selection)
+	- [\[スキップ\]Exercise: Equivalent Binary Trees](#スキップexercise-equivalent-binary-trees)
+	- [\[スキップ\]Exercise: Equivalent Binary Trees](#スキップexercise-equivalent-binary-trees-1)
+	- [sync.Mutex](#syncmutex)
+	- [\[スキップ\]Exercise: Web Crawler](#スキップexercise-web-crawler)
 
 ---
 
@@ -243,8 +342,8 @@ func main() {
 
 ---
 
-### [未]Variables
-### [未]Variables with initializers
+### [スキップ]Variables
+### [スキップ]Variables with initializers
 
 ---
 ### Short variable declarations
@@ -276,7 +375,7 @@ func main() {
 
 ---
 
-### [未]Basic types
+### [スキップ]Basic types
 
 ---
 
@@ -316,29 +415,316 @@ func main() {
 
 ---
 
-### [未]Type conversions
-### [未]Type inference
-### [未]Constants
-### [未]Numeric Constants
+### [スキップ]Type conversions
+### [スキップ]Type inference
 
 ---
 
-### [未]For
-### [未]For continued
-### [未]For is Go's "while"
-### [未]Forever
-### [未]If
-### [未]If with a short statement
-### [未]If and else
-### [未]Exercise: Loops and Functions
-### [未]Switch
-### [未]Switch evaluation order
-### [未]Switch with no condition
-### [未]Defer
-### [未]Stacking defers
-### [未]Congratulations!
+### Constants
+
+```go
+package main
+
+import "fmt"
+
+const Pi = 3.14
+
+func main() {
+	const World = "世界"
+	fmt.Println("Hello", World)
+	fmt.Println("Happy", Pi, "Day")
+
+	const Truth = true
+	fmt.Println("Go rules?", Truth)
+}
+```
+
+実行結果：
+```
+Hello 世界
+Happy 3.14 Day
+Go rules? true
+```
+
+メモ：
+- const は 変わらない値 を表す
+- := では宣言できない（const x = 1）
+- 使える型は 数値・文字列・bool のみ
+- Goの const は「値」そのものを表し、型に縛られない
+  - 使われる場所（文脈）で、最適な型に“はめ込まれる”
+  - 型なし定数（untyped constant）と呼ばれる
+    ```go
+    const n = 10
+    var a int     = n  // OK
+    var b int64   = n  // OK
+    var c float64 = n  // OK
+    ```
+    - n は代入先の型として解釈される（文脈で型が決まる）
+    - math / time / DB で効果的
+      - (例)math（r が変数だと、型合わせが必要。）
+      ```
+      const r = 3
+      area := math.Pi * r * r  // OK
+      ```
+- マジックナンバーを消すためにも使う
+- 設計上の 「不変」という意図を表現できる
+
 
 ---
+
+### [スキップ]Numeric Constants
+
+---
+## Flow control statements: for, if, else, switch and defer
+
+### For
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	sum := 0
+	for i := 0; i < 10; i++ {
+		sum += i
+	}
+	fmt.Println(sum)
+}
+```
+
+実行結果：
+```
+45
+```
+
+メモ：
+- Go のループ構文は `for` だけ（`while` / `do-while` はない）
+- 基本形は `for 初期化; 条件; 後処理 { }`
+- `()` は不要、`{}` は必須
+- `for i := 0; ...` の変数は for のスコープ内のみ有効
+- 条件が false になるとループ終了
+- 無限ループは `for {}` で書く
+
+---
+
+### [スキップ]For continued
+### [スキップ]For is Go's "while"
+### [スキップ]Forever
+
+---
+
+### If
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+func sqrt(x float64) string {
+	if x < 0 {
+		return sqrt(-x) + "i"
+	}
+	return fmt.Sprint(math.Sqrt(x))
+}
+
+func main() {
+	fmt.Println(sqrt(2), sqrt(-4))
+}
+```
+
+実行結果：
+```
+1.4142135623730951 2i
+
+```
+
+メモ：
+- IFは `if 条件 { }` が基本形。`()` は不要、`{}` は必須
+- 条件式は bool 型のみ（数値や nil は不可）
+- if の前で 短縮変数宣言ができる
+    ```go
+    if v := f(); v > 0 { }
+    ```
+- その変数のスコープは if / else 内のみ
+- else if / else が使える
+- else は 必ず直前の if の } と同じ行
+
+
+---
+
+### [スキップ]If with a short statement
+### [スキップ]If and else
+### [スキップ]Exercise: Loops and Functions
+
+---
+
+### Switch
+
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+)
+
+func main() {
+	fmt.Print("Go runs on ")
+	switch os := runtime.GOOS; os {
+	case "darwin":
+		fmt.Println("OS X.")
+	case "linux":
+		fmt.Println("Linux.")
+	default:
+		// freebsd, openbsd,
+		// plan9, windows...
+		fmt.Printf("%s.\n", os)
+	}
+}
+```
+
+実行結果：
+```
+Go runs on Linux.
+```
+
+メモ：
+- `switch` は `if-else` の簡潔な書き方
+- 他の言語と異なり、自動で `break` する（次のcaseに行かない）
+  - `fallthrough`構文はあるが、次の case の条件を評価せずに本体を実行するため注意が必要
+  - 2つの条件を両方評価して実行したいならswitchは使わずifを使う
+- case は 定数でなくてよい
+- 式の型は自由（int 以外もOK）
+- switch で 短縮変数宣言ができる（if同様）
+- `switch {}` で if 代わりに使える（if-else より 読みやすく条件分岐の「列挙」に向いている）
+- default は省略可
+
+
+---
+
+### [スキップ]Switch evaluation order
+### [スキップ]Switch with no condition
+
+---
+
+### Defer
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	defer fmt.Println("world")
+
+	fmt.Println("hello")
+}
+```
+
+実行結果：
+```
+hello
+world
+```
+
+メモ：
+- defer は、指定した関数の実行を呼び出し元の関数終了直前まで遅延させる
+- defer に渡した 関数の引数は、その場ですぐ評価される
+  - 以下例がわかりやすい
+    ```go
+    func main() {
+      x := "world"
+      defer fmt.Println(x) // world
+      x = "golang"
+    }
+    ```
+  - `defer fmt.Println(x)` の時点で x の値は `"world"`
+  - その値が `defer` 用に保存される
+  - 後で `x` が変わっても関係ない
+- 実際の関数呼び出しは return 直前（panic 時も含む） に行われる
+- defer された処理は、後に書いたものから先に実行される（LIFO 後入れ先出し）
+- 関数内で `return` がどこにあっても、`defer` は必ず実行される
+- 主な用途は リソースの後片付け（ファイルClose, mutexのUnlock など）
+- `panic` が起きても実行される（`recover` があれば復旧できる）
+- Go らしい書き方
+  - 成功直後に defer を書く 
+  - 「後始末がある処理の近くに書く」ことで可読性が上がる
+    ```go
+    f, err := os.Open("file.txt")
+    if err != nil {
+        return err
+    }
+    defer f.Close()
+    // 以降は安心して処理を書ける
+    ```
+- Go では エラー処理や安全な終了を簡潔に書くための重要な構文
+
+---
+
+### Stacking defers
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("counting")
+
+	for i := 0; i < 10; i++ {
+		defer fmt.Println(i)
+	}
+
+	fmt.Println("done")
+}
+```
+
+実行結果：
+```
+counting
+done
+9
+8
+7
+6
+5
+4
+3
+2
+1
+```
+
+メモ：
+- このコードの実行順序
+  - 1.`fmt.Println("counting")` → `counting`
+  - 2.for ループで `i = 0..9` の defer が積まれる
+    - i=0 → defer fmt.Println(0)
+    - i=1 → defer fmt.Println(1)
+    - …
+    - i=9 → defer fmt.Println(9)
+  - 3.`fmt.Println("done")` → `done`
+  - 4.関数終了 → defer が LIFO(後入れ先出し) で実行
+    - fmt.Println(9)
+    - fmt.Println(8)
+    - …
+    - fmt.Println(0)
+- 複数の defer は スタックに積まれる（LIFO(last-in-first-out) ：後入れ先出し）
+- 関数終了時に、最後に書いた defer から順に実行される
+- 引数は defer 行で即評価される
+- for ループで defer すると 逆順で実行される
+- 複数リソースや mutex の解放順を自然に制御できる
+- panic が起きても defer は LIFO 順で実行される
+- 高頻度ループでの defer は メモリコストに注意
+- クロージャは外側変数を参照する（**わかりづらいので後でまとめ直したい**）
+  - そのため、for ループ変数を無名関数で defer すると、最後の値しか参照されない
+  - 意図した値を出すには 変数をコピーする か クロージャに引数として渡す
+
+---
+## More types: structs, slices, and maps.
 
 ### Pointers
 ```go
@@ -413,7 +799,7 @@ func main() {
 
 ---
 
-### [未]Struct Fields
+### [スキップ]Struct Fields
 
 ---
 
@@ -449,8 +835,43 @@ func main() {
 
 ---
 
-### [未]Struct Literals
-### [未]Arrays
+### [スキップ]Struct Literals
+
+---
+
+### Arrays
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var a [2]string
+	a[0] = "Hello"
+	a[1] = "World"
+	fmt.Println(a[0], a[1])
+	fmt.Println(a)
+
+	primes := [6]int{2, 3, 5, 7, 11, 13}
+	fmt.Println(primes)
+}
+```
+
+実行結果：
+```
+Hello World
+[Hello World]
+[2 3 5 7 11 13]
+```
+
+メモ：
+- Goの配列は固定長
+- [n]T は型 T の長さ n の配列を表す
+- 配列の長さは型の一部で、後から変更できない
+- インデックスで要素にアクセス・代入可能 (a[0] = "Hello")
+- 配列リテラルで初期化可能 (primes := [6]int{2,3,5,7,11,13})
+- 配列をまとめて出力できる (fmt.Println(a))
 
 ---
 
@@ -523,8 +944,8 @@ func main() {
 
 ---
 
-### [未]Slice literals
-### [未]Slice defaults
+### [スキップ]Slice literals
+### [スキップ]Slice defaults
 
 ---
 
@@ -664,7 +1085,7 @@ d len=3 cap=3 [0 0 0]
 
 ---
 
-### [未]Slices of slices
+### [スキップ]Slices of slices
 
 ---
 
@@ -750,8 +1171,49 @@ func main() {
 
 ---
 
-### [未]Range continued
-### [未]Exercise: Slices
+### Range continued
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	pow := make([]int, 10)
+	for i := range pow {
+		pow[i] = 1 << uint(i) // == 2**i
+	}
+	for _, value := range pow {
+		fmt.Printf("%d\n", value)
+	}
+}
+```
+
+実行結果：
+```
+1
+2
+4
+8
+16
+32
+64
+128
+256
+512
+```
+
+メモ：
+- `for i, _ := range slice` → 値を捨てる
+- `for _, value := range slice` → インデックスを捨てる
+- `for i := range slice` → 値を使わずインデックスだけ使う
+- `_` は「使わない変数」を表す特殊識別子
+
+
+
+---
+
+### [スキップ]Exercise: Slices
 
 ---
 
@@ -791,8 +1253,8 @@ func main() {
 
 ---
 
-### [未]Map literals
-### [未]Map literals continued
+### [スキップ]Map literals
+### [スキップ]Map literals continued
 
 ---
 
@@ -837,7 +1299,7 @@ The value: 0 Present? false
 
 ---
 
-### [未]Exercise: Maps
+### [スキップ]Exercise: Maps
 
 ---
 
@@ -974,7 +1436,7 @@ func main() {
 
 ---
 
-### [未]Exercise: Fibonacci closure
+### [スキップ]Exercise: Fibonacci closure
 
 ---
 
@@ -1119,9 +1581,9 @@ func main() {
 ---
 
 ### [スキップ]Pointers and functions
-### [未]Methods and pointer indirection
-### [未]Methods and pointer indirection (2)
-### [未]Choosing a value or pointer receiver
+### [スキップ]Methods and pointer indirection
+### [スキップ]Methods and pointer indirection (2)
+### [スキップ]Choosing a value or pointer receiver
 
 ---
 
@@ -1369,7 +1831,7 @@ Arthur Dent (42 years) Zaphod Beeblebrox (9001 years)
 
 ---
 
-### [未]Exercise: Stringers
+### [スキップ]Exercise: Stringers
 
 ---
 
@@ -1421,12 +1883,12 @@ at 2026-01-09 11:54:35.282602 +0900 JST m=+0.000180501, it didn't work
 
 ---
 
-### [未]Exercise: Errors
-### [未]Readers
-### [未]Exercise: Readers
-### [未]Exercise: rot1 3Reader
+### [スキップ]Exercise: Errors
+### [スキップ]Readers
+### [スキップ]Exercise: Readers
+### [スキップ]Exercise: rot1 3Reader
 ### [スキップ]Images
-### [未]Exercise: Images
+### [スキップ]Exercise: Images
 
 ---
 
@@ -1921,8 +2383,8 @@ BOOM!
 
 ---
 
-### [未]Exercise: Equivalent Binary Trees
-### [未]Exercise: Equivalent Binary Trees
+### [スキップ]Exercise: Equivalent Binary Trees
+### [スキップ]Exercise: Equivalent Binary Trees
 
 ---
 
@@ -1990,6 +2452,6 @@ func main() {
 
 ---
 
-### [未]Exercise: Web Crawler
+### [スキップ]Exercise: Web Crawler
 
 ---
