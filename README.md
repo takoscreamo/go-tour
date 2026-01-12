@@ -1529,14 +1529,467 @@ func main() {
 ---
 
 ## Concurrency
-### [未]Goroutines
-### [未]Channels
-### [未]Buffered Channels
-### [未]Range and Close
-### [未]Select
-### [未]Default Selection
+
+### Goroutines
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func say(s string) {
+	for i := 0; i < 5; i++ {
+		time.Sleep(100 * time.Millisecond)
+		fmt.Println(s)
+	}
+}
+
+func main() {
+	go say("world")
+	say("hello")
+}
+```
+
+実行結果：（出力順は毎回変わる）
+```
+hello
+world
+hello
+world
+world
+hello
+hello
+world
+hello
+```
+
+メモ：
+- goroutine（ゴルーチン）は、Goのランタイムに管理される軽量な実行単位
+  - OSスレッドそのものではない
+  - Goランタイムが必要に応じてOSスレッドに割り当てる（goroutine は OSスレッドの上に乗っている）
+  - OSスレッド より 圧倒的に軽い
+  - 数万〜数十万起動しても現実的
+  - `Goが用意しためちゃくちゃ軽いスレッドのようなもの` くらいの理解でOK
+- `main()` もgoroutineの一つ。一番最初に実行されるgoroutine
+    ```
+    func main() {
+    	go say("world") // 新しいgoroutine で実行される
+    	say("hello")    // main goroutine で実行される
+    }
+    ```
+  - すべてのコードは必ず何らかの goroutine 上で動く
+  - main goroutine が終了すると、プログラム全体が終了する
+- `go say("world")` の意味は「関数呼び出し」ではなく「並行実行の開始」
+  - ① `main goroutine`で引数を準備する
+  - ② `新しいgoroutine`を起動
+  - ③ sayの処理は`新しいgoroutine`に任せる
+  - ④ 自分(`main goroutine`)は止まらず次へ進む
+- 実行結果の出力順は保証されない
+  - スケジューリングは Go ランタイム任せで、実行タイミングは毎回微妙に異なる
+- goroutine は同じアドレス空間で実行される
+  - メモリは共有されるため、データ競合の危険がある
+  - Goでは次章以降で解説する channel を使ったデータのやり取りが推奨される
+
+---
+
+### Channels
+
+```go
+package main
+
+import "fmt"
+
+func sum(s []int, c chan int) {
+	sum := 0
+	for _, v := range s {
+		sum += v
+	}
+	c <- sum // 計算結果をチャネルへ送信（戻り値なし）
+}
+
+func main() {
+	s := []int{7, 2, 8, -9, 4, 0}
+
+	c := make(chan int)
+	go sum(s[:len(s)/2], c) // 前半: [7, 2, 8]
+	go sum(s[len(s)/2:], c) // 後半: [-9, 4, 0]
+	x, y := <-c, <-c        // 先に終わった goroutine の値が x に入る(順不同)
+
+	fmt.Println(x, y, x+y)
+}
+```
+
+実行結果：（順不同）
+```
+-5 17 12
+```
+
+メモ：
+- チャネルは goroutine 間で値を受け渡す通り道
+- `ch <- v` // v をチャネル ch へ送信する
+- `v := <-ch` // ch から受信した変数を v へ割り当てる
+- 非バッファチャネルでは
+  - `ch <- v` は 受信側が来るまでブロック
+  - `<-ch` は 送信側が来るまでブロック
+  - 送信と受信は 同時に揃った瞬間だけ値が渡る
+  - この仕組みは `握手モデル` と呼ばれる
+- ブロックにより：
+  - goroutine の 同期(完了待ち) が自然に書ける
+  - ロックや条件変数が不要
+  - 値が中途半端な状態で観測されない
+  - ブロックは 無駄な待ちではない
+    - OSスレッドを止めない
+    - Goランタイムが安全にスケジューリング
+    - <-ch は Go における await 相当
+- goroutine で動かす前提の関数は、戻り値の代わりにチャネルへ送信するのが基本
+- チャネルは データ転送＋同期 を同時に実現する
+
+---
+
+### Buffered Channels
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// ×悪い例（`ch <- 3`で送信がブロックし、main goroutine が進めなくなってデッドロックする）
+	// ch := make(chan int, 2)
+	// ch <- 1
+	// ch <- 2
+	// ch <- 3
+	// fmt.Println(<-ch)
+	// fmt.Println(<-ch)
+	// fmt.Println(<-ch)
+
+	// ◯良い例（バッファを空ける）
+	// ch := make(chan int, 2)
+	// ch <- 1
+	// ch <- 2
+	// fmt.Println(<-ch) // 1つ空く
+	// ch <- 3           // ここで送信できる
+	// fmt.Println(<-ch)
+	// fmt.Println(<-ch)
+
+	// ◎より良い例（goroutineを使って送信と受信を分離）
+	ch := make(chan int, 2)
+	go func() {
+		ch <- 1
+		ch <- 2
+		ch <- 3
+	}()
+	fmt.Println(<-ch)
+	fmt.Println(<-ch)
+	fmt.Println(<-ch)
+}
+```
+
+実行結果：
+```
+1
+2
+3
+```
+
+メモ：
+- バッファ付きチャネルは 値を一時的に溜めるキュー
+- `ch := make(chan int, 2)` でmake の２つ目の引数にバッファの長さを与える
+- 送信（ch <- v）のルール
+  - バッファに 空きがあれば → すぐ送信できる（ブロックしない）
+  - バッファが 満杯なら → 受信されるまでブロック
+- 受信（<-ch）のルール
+  - バッファに 値があれば → すぐ受信できる
+  - バッファが 空なら → 送信されるまでブロック
+- デッドロックは、送信や受信で処理が止まったとき(ブロックした時)、その待ち状態を解消できる goroutine が他に存在しない場合にデッドロックが起きる。
+
+---
+
+### Range and Close
+
+```go
+package main
+
+import "fmt"
+
+func fibonacci(n int, c chan int) {
+	x, y := 0, 1
+	for i := 0; i < n; i++ {
+		c <- x
+		x, y = y, x+y
+	}
+	close(c)
+}
+
+func main() {
+	c := make(chan int, 10)
+	go fibonacci(cap(c), c)
+	for i := range c {
+		fmt.Println(i)
+	}
+}
+```
+
+実行結果：
+```
+
+```
+
+メモ：
+- close(ch) は「これ以上値を送らない」という終了通知
+- チャネルを close しても受信は可能（送信は不可・panicになる）
+- close すべきなのは送信側。受信側が close すると設計破綻しやすい
+- 受信時は `v, ok := <-ch` で close を検知できる
+  - `ok == false` → チャネルが close され、値がない
+- `for v := range ch` を使えば自分でokの判定を書かなくて良い。
+  - 内部的に以下と同じことをしている
+    ```
+    for {
+      v, ok := <-ch
+      if !ok {
+          break
+      }
+      ...
+    }
+    ```
+  - `range ch` はチャネルが close されるまで受信し続ける
+  - チャネルが close され、かつ空になった瞬間に自動で終了
+  - close がないと `range ch` は終了せず、デッドロックする
+- チャネルは **基本 close しなくてよい**
+  - 単発の送受信やリクエスト/レスポンス型では不要
+  - close が必要なのは「もう値が来ないことを受け手に伝えたいとき」だけ
+    - 例えば、for range、ストリーム処理、ワーカー終了通知
+
+
+---
+
+### Select
+
+```go
+package main
+
+import "fmt"
+
+func fibonacci(c, quit chan int) {
+	x, y := 0, 1 // フィボナッチ数列の初期値
+	for {        // 無限ループ。 select内で止める前提
+		select {
+		case c <- x: // 受信側がいて、c に送信できるなら x を送る
+			x, y = y, x+y
+		case <-quit: // quit に何か送られてきたら"quit" を表示して関数を終了
+			fmt.Println("quit")
+			return
+		}
+	}
+}
+
+func main() {
+	c := make(chan int)
+	quit := make(chan int)
+	go func() {
+		for i := 0; i < 10; i++ {
+			fmt.Println(<-c) // c から 10 回受信して表示
+		}
+		quit <- 0 // 0 に意味はなく「送られた」という事実が重要
+	}()
+	fibonacci(c, quit)
+}
+```
+
+実行結果：
+```
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+quit
+```
+
+メモ：
+- 各チャネルの役割（ややこしいので先に整理）
+  - `c`チャネル は値（データ）を流すためのチャネル
+    - 送信側：fibonacci
+    - 受信側：無名関数（go func）
+  - `quit`チャネル は制御（終了通知）を流すためのチャネル
+    - 送信側：無名関数（go func）
+    - 受信側：fibonacci
+- このコードの流れ
+  - fibonacci が c <- x を試みる（送信する）
+  - 無名関数 が <-c する（受信する）
+  - フィボナッチ数が表示される
+  - これを 10 回繰り返す
+  - 無名関数のforループが終了して quit <- 0（終了通知を送信）
+  - select の case <-quit が成立（終了通知を受信）
+  - "quit" を表示して return（fibonacci関数終了）
+  - プログラム終了
+- `select`とは
+  - select は 複数のチャネル操作を同時に待つための構文
+  - select は、準備できた case を1つ実行する。複数準備できていれば ランダムに選択
+- `quit`とは
+  - quit チャネルは「処理をやめろ」という 制御シグナル
+  - select と組み合わせて使う
+  - goroutine が 自分で return して終了
+- `close`と`quit`の役割の違い
+  - close → データの終端を表す
+  - quit → 処理の中断・キャンセルを表す
+- 設計指針
+  - 値の列が自然に終わる → close
+  - 途中で止めたい／外部から制御したい → quit / context
+- 実務では `quit` はほぼ `ctx.Done()` に置き換わる
+- select + quit を理解できるとcontext.Context の ctx.Done() が理解できる
+- `fibonacci()`の引数について
+  - 実務ではチャネルの方向性を明示した書き方がベター
+    ```go
+    func fibonacci(c chan<- int, quit <-chan int) {
+    ```
+  - chan<- int：送信専用（c）
+  - <-chan int：受信専用（quit）
+  - 「役割が固定されている」ことを型で保証できる
+- まとめると
+  - close は「データ終了」
+  - quit は「処理中断」
+
+---
+
+### Default Selection
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	tick := time.Tick(100 * time.Millisecond)  // 指定間隔ごとに通知するチャネル
+	boom := time.After(500 * time.Millisecond) // 指定時間後に1回だけ通知するチャネル
+	for {
+		select {
+		case <-tick:
+			fmt.Println("tick.")
+		case <-boom:
+			fmt.Println("BOOM!")
+			return
+		default:
+			fmt.Println("    .")
+			time.Sleep(50 * time.Millisecond)
+		}
+	}
+}
+```
+
+実行結果：
+```
+    .
+    .
+tick.
+    .
+    .
+tick.
+    .
+    .
+tick.
+    .
+    .
+tick.
+    .
+    .
+tick.
+BOOM!
+```
+
+メモ：
+- select は 複数のチャネル操作を同時に待つ制御構文
+- 実行可能な case が1つでもあれば、それが選ばれる
+- default を書くと
+  - どの case も準備できていない場合に即実行
+  - select が ブロックしなくなる
+- default 付き select は
+  - ポーリング / ゲームループ / 監視処理 に使われる
+  - sleep なしだと CPU を浪費する
+- time.Tick / time.After は「時間イベントを流すチャネル」
+
+---
+
 ### [未]Exercise: Equivalent Binary Trees
-### [未]Exercise: Equivalent Binary Trees sync.Mutex
+### [未]Exercise: Equivalent Binary Trees
+
+---
+
+### sync.Mutex
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+	"time"
+)
+
+// SafeCounter は並列処理しても安全。
+type SafeCounter struct {
+	mu sync.Mutex
+	v  map[string]int
+}
+
+// Inc は指定されたキーのカウンタをインクリメントする。
+func (c *SafeCounter) Inc(key string) {
+	c.mu.Lock()
+	// 一度に 1 つの goroutine だけがマップ c.v. にアクセスできるようにロックする。
+	c.v[key]++
+	c.mu.Unlock()
+}
+
+// Value は指定されたキーのカウンタの現在の値を返す。
+func (c *SafeCounter) Value(key string) int {
+	c.mu.Lock()
+	// 一度に 1 つの goroutine だけがマップ c.v. にアクセスできるようにロックする。
+	defer c.mu.Unlock() // deferを使う理由は、将来if文やpanicが増えた場合に備えてどんな経路でも必ず Unlock される ことを保証するため
+	return c.v[key]
+}
+
+func main() {
+	c := SafeCounter{v: make(map[string]int)}
+	for i := 0; i < 1000; i++ {
+		go c.Inc("somekey") // 1000個の goroutine が同時に Inc を呼ぶ
+	}
+
+	time.Sleep(time.Second) // Sleep は簡易的な待機（本番では sync.WaitGroup を使う）
+	fmt.Println(c.Value("somekey"))
+}
+```
+
+実行結果：
+```
+1000
+```
+
+メモ：
+- goroutine は軽量で簡単に並行実行できるが、共有データへの同時アクセスは自動では安全（ゴルーチンセーフ）にならない
+- goroutine 間で 共有変数を安全に扱うために排他制御が必要
+- 排他制御（mutual exclusion）を実現する仕組みが Mutex
+- Goでは `sync.Mutex` を使い、`Lock()` / `Unlock()` で制御する
+- 同時に1つの goroutine だけが Lock 区間を実行できる
+- map など ゴルーチンセーフ でないデータは Mutex で保護する
+- Lock と Unlock は必ずペアで使う
+- `defer mu.Unlock()` を使うと Unlock 漏れを防げる
+- 読み取り（参照）だけでも Lock が必要
+- goroutine 間で「通知・受け渡し・停止」を表現したい場合はチャネルが向くが、
+単に共有データを安全に守りたい場合は Mutex が最適
+
+---
+
 ### [未]Exercise: Web Crawler
 
 ---
